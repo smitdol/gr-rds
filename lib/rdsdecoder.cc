@@ -23,9 +23,7 @@
 #include "tmc_events.h"
 #include <math.h>
 
-using namespace gr::rds;
-
-parser_impl::parser_impl(bool log, bool debug, unsigned char pty_locale, void* callback(long, std::string&))
+rdsdecoder::rdsdecoder(bool log, bool debug, unsigned char pty_locale, void* callback(long, std::string&))
 	: gr::block ("gr_rds_parser",
 	log(log),
 	debug(debug),
@@ -35,10 +33,10 @@ parser_impl::parser_impl(bool log, bool debug, unsigned char pty_locale, void* c
 	reset();
 }
 
-parser_impl::~parser_impl() {
+rdsdecoder::~rdsdecoder() {
 }
 
-void parser_impl::reset() {
+void rdsdecoder::reset() {
 //	gr::thread::scoped_lock lock(d_mutex);
 
 	memset(radiotext, ' ', sizeof(radiotext));
@@ -65,12 +63,12 @@ void parser_impl::reset() {
  * type 4 = RadioText 
  * type 5 = ClockTime
  * type 6 = Alternative Frequencies */
-void parser_impl::send_message(long msgtype, std::string& msgtext) {
+void rdsdecoder::send_message(long msgtype, std::string& msgtext) {
     callback(msgtype, msgtext);
 }
 
 /* BASIC TUNING: see page 21 of the standard */
-void parser_impl::decode_type0(unsigned int *group, bool B) {
+void rdsdecoder::decode_type0(unsigned int *group, bool B) {
 	unsigned int af_code_1 = 0;
 	unsigned int af_code_2 = 0;
 	unsigned int  no_af    = 0;
@@ -163,7 +161,7 @@ void parser_impl::decode_type0(unsigned int *group, bool B) {
 	send_message(6, af_string);
 }
 
-double parser_impl::decode_af(unsigned int af_code) {
+double rdsdecoder::decode_af(unsigned int af_code) {
 	static unsigned int number_of_freqs = 0;
 	static bool vhf_or_lfmf             = 0; // 0 = vhf, 1 = lf/mf
 	double alt_frequency                = 0; // in kHz
@@ -197,7 +195,7 @@ double parser_impl::decode_af(unsigned int af_code) {
 	return alt_frequency;
 }
 
-void parser_impl::decode_type1(unsigned int *group, bool B){
+void rdsdecoder::decode_type1(unsigned int *group, bool B){
 	int ecc    = 0;
 	int paging = 0;
 	char country_code           = (group[0] >> 12) & 0x0f;
@@ -252,7 +250,7 @@ void parser_impl::decode_type1(unsigned int *group, bool B){
 	}
 }
 
-void parser_impl::decode_type2(unsigned int *group, bool B){
+void rdsdecoder::decode_type2(unsigned int *group, bool B){
 	unsigned char text_segment_address_code = group[1] & 0x0f;
 
 	// when the A/B flag is toggled, flush your current radiotext
@@ -276,7 +274,7 @@ void parser_impl::decode_type2(unsigned int *group, bool B){
 	send_message(4,std::string(radiotext, sizeof(radiotext)));
 }
 
-void parser_impl::decode_type3(unsigned int *group, bool B){
+void rdsdecoder::decode_type3(unsigned int *group, bool B){
 	if(B) {
 		dout << "type 3B not implemented yet" << std::endl;
 		return;
@@ -319,7 +317,7 @@ void parser_impl::decode_type3(unsigned int *group, bool B){
 	lout << "message: " << message << " - aid: " << aid << std::endl;;
 }
 
-void parser_impl::decode_type4(unsigned int *group, bool B){
+void rdsdecoder::decode_type4(unsigned int *group, bool B){
 	if(B) {
 		dout << "type 4B not implemented yet" << std::endl;
 		return;
@@ -348,19 +346,19 @@ void parser_impl::decode_type4(unsigned int *group, bool B){
 	send_message(5,time);
 }
 
-void parser_impl::decode_type5(unsigned int *group, bool B){
+void rdsdecoder::decode_type5(unsigned int *group, bool B){
 	dout << "type 5 not implemented yet" << std::endl;
 }
 
-void parser_impl::decode_type6(unsigned int *group, bool B){
+void rdsdecoder::decode_type6(unsigned int *group, bool B){
 	dout << "type 6 not implemented yet" << std::endl;
 }
 
-void parser_impl::decode_type7(unsigned int *group, bool B){
+void rdsdecoder::decode_type7(unsigned int *group, bool B){
 	dout << "type 7 not implemented yet" << std::endl;
 }
 
-void parser_impl::decode_type8(unsigned int *group, bool B){
+void rdsdecoder::decode_type8(unsigned int *group, bool B){
 	if(B) {
 		dout << "type 8B not implemented yet" << std::endl;
 		return;
@@ -417,7 +415,7 @@ void parser_impl::decode_type8(unsigned int *group, bool B){
 	}
 }
 
-void parser_impl::decode_optional_content(int no_groups, unsigned long int *free_format){
+void rdsdecoder::decode_optional_content(int no_groups, unsigned long int *free_format){
 	int label          = 0;
 	int content        = 0;
 	int content_length = 0;
@@ -437,27 +435,27 @@ void parser_impl::decode_optional_content(int no_groups, unsigned long int *free
 	}
 }
 
-void parser_impl::decode_type9(unsigned int *group, bool B){
+void rdsdecoder::decode_type9(unsigned int *group, bool B){
 	dout << "type 9 not implemented yet" << std::endl;
 }
 
-void parser_impl::decode_type10(unsigned int *group, bool B){
+void rdsdecoder::decode_type10(unsigned int *group, bool B){
 	dout << "type 10 not implemented yet" << std::endl;
 }
 
-void parser_impl::decode_type11(unsigned int *group, bool B){
+void rdsdecoder::decode_type11(unsigned int *group, bool B){
 	dout << "type 11 not implemented yet" << std::endl;
 }
 
-void parser_impl::decode_type12(unsigned int *group, bool B){
+void rdsdecoder::decode_type12(unsigned int *group, bool B){
 	dout << "type 12 not implemented yet" << std::endl;
 }
 
-void parser_impl::decode_type13(unsigned int *group, bool B){
+void rdsdecoder::decode_type13(unsigned int *group, bool B){
 	dout << "type 13 not implemented yet" << std::endl;
 }
 
-void parser_impl::decode_type14(unsigned int *group, bool B){
+void rdsdecoder::decode_type14(unsigned int *group, bool B){
 	
 	bool tp_on               = (group[1] >> 4) & 0x01;
 	char variant_code        = group[1] & 0x0f;
@@ -534,11 +532,11 @@ void parser_impl::decode_type14(unsigned int *group, bool B){
 	lout << std::endl;
 }
 
-void parser_impl::decode_type15(unsigned int *group, bool B){
+void rdsdecoder::decode_type15(unsigned int *group, bool B){
 	dout << "type 15 not implemented yet" << std::endl;
 }
 
-void parser_impl::parse(unsigned int* group) {
+void rdsdecoder::parse(unsigned int* group) {
 	// TODO: verify offset chars are one of: "ABCD", "ABcD", "EEEE" (in US)
 
 	unsigned int group_type = (unsigned int)((group[1] >> 12) & 0xf);
