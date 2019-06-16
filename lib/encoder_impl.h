@@ -17,7 +17,7 @@
 #ifndef INCLUDED_RDS_ENCODER_IMPL_H
 #define INCLUDED_RDS_ENCODER_IMPL_H
 
-#include <rds/encoder.h>
+#include ../rds/encoder.h
 #include <gnuradio/thread/thread.h>
 
 namespace gr {

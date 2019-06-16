@@ -17,7 +17,7 @@
 #ifndef INCLUDED_RDS_PARSER_IMPL_H
 #define INCLUDED_RDS_PARSER_IMPL_H
 
-#include <rds/parser.h>
+#include ../rds/parser.h
 #include <gnuradio/thread/thread.h>
 
 namespace gr {
